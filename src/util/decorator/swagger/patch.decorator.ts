@@ -10,7 +10,7 @@ interface PatchApiOptions {
     type?: any;
   }[];
   httpCode?: HttpStatus;
-  param: string;
+  param: { name: string; description: string };
   body: {
     type: any;
     description?: string;
@@ -43,11 +43,12 @@ export function PatchApi({
     decorators.push(...apiResponses);
   }
 
-  // Add ApiBody using model
   if (param) {
-    decorators.push(ApiParam({ name: param }));
+    decorators.push(
+      ApiParam({ name: param.name, description: param.description }),
+    );
   }
-  // Add ApiBody using model
+
   if (body) {
     decorators.push(
       ApiBody({

@@ -10,7 +10,7 @@ interface DeleteApiOptions {
     type?: any;
   }[];
   httpCode?: HttpStatus;
-  param?: string;
+  param?: { name: string; description: string };
 }
 
 export function DeleteApi({
@@ -38,9 +38,10 @@ export function DeleteApi({
     decorators.push(...apiResponses);
   }
 
-  // Add ApiBody using model
   if (param) {
-    decorators.push(ApiParam({ name: param }));
+    decorators.push(
+      ApiParam({ name: param.name, description: param.description }),
+    );
   }
 
   return applyDecorators(...decorators);

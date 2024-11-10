@@ -1,6 +1,8 @@
 import {
   ConflictException,
+  HttpException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -51,7 +53,10 @@ export class AuthService {
 
       return user;
     } catch (error) {
-      throw new Error((error as Error).message);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException((error as Error).message);
     }
   }
 
@@ -87,7 +92,10 @@ export class AuthService {
       user.password = undefined;
       return user;
     } catch (error) {
-      throw new Error((error as Error).message);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException((error as Error).message);
     }
   }
 

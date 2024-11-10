@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModel } from 'src/model/user/user.model';
+import { JWTHelper } from 'src/util/helper/jwt.helper';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { UserModel } from 'src/model/user/user.model';
     ]),
   ],
   controllers: [UserController],
-  providers: [UserService, MongooseModule],
+  providers: [UserService, JWTHelper],
 })
 export class UserModule {}

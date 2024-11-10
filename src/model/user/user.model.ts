@@ -44,6 +44,9 @@ export class User extends Document {
 
   @Property({ required: false, type: String, enum: Type, default: 'USER' })
   public type: Type;
+
+  @Property({ required: false, type: Number, default: 0 })
+  deleteStatus: number;
 }
 
 export const UserModel = getModelForClass(User);
