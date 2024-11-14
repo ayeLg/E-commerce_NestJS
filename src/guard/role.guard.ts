@@ -17,10 +17,9 @@ export class RoleGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredRole = this.reflector.get<string>(
-      'role',
-      context.getHandler(),
-    );
+    const requiredRole =
+      this.reflector.get<string>('role', context.getHandler()) ||
+      this.reflector.get<string>('role', context.getClass());
 
     if (!requiredRole) {
       return true; // If no role is defined, allow access

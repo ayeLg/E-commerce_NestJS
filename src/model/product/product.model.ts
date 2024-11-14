@@ -1,7 +1,12 @@
-import { getModelForClass } from '@typegoose/typegoose';
+import { getModelForClass, Ref } from '@typegoose/typegoose';
+import { Document, Types } from 'mongoose';
 import Property from 'src/util/decorator/model/property.decorator';
+import { User } from '../user/user.model';
 
-export class Product {
+export class Product extends Document {
+  @Property({ required: true, type: Types.ObjectId, ref: () => User })
+  userId: Ref<User>;
+
   @Property(
     { required: true, type: String }, // Typegoose options
     { description: 'The name of the product', example: 'Apple' }, // Swagger options

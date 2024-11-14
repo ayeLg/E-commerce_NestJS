@@ -1,7 +1,7 @@
-import { Ref } from '@typegoose/typegoose';
+import { getModelForClass, Ref } from '@typegoose/typegoose';
 import { Order } from '../order/order.model';
 import Property from 'src/util/decorator/model/property.decorator';
-import { Types } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 enum PaymentMethod {
   CREDIT_CARD = 'CREDIT_CARD',
@@ -38,3 +38,4 @@ export class Payment extends Document {
   })
   status: PaymentStatus;
 }
+export const PaymentModel = getModelForClass(Payment);

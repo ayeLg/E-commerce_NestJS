@@ -10,7 +10,12 @@ interface DeleteApiOptions {
     type?: any;
   }[];
   httpCode?: HttpStatus;
-  param?: { name: string; description: string };
+  param?:
+    | { name: string; description: string }
+    | {
+        name: string;
+        description: string;
+      }[];
 }
 
 export function DeleteApi({
@@ -38,10 +43,18 @@ export function DeleteApi({
     decorators.push(...apiResponses);
   }
 
+  // Handle parameters
   if (param) {
-    decorators.push(
-      ApiParam({ name: param.name, description: param.description }),
-    );
+    if (Array.isArray(param)) {
+      // Check if param is an array
+      param.forEach((p) => {
+        decorators.push(ApiParam({ name: p.name, description: p.description }));
+      });
+    } else {
+      decorators.push(
+        ApiParam({ name: param.name, description: param.description }),
+      );
+    }
   }
 
   return applyDecorators(...decorators);

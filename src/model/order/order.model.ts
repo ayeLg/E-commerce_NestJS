@@ -1,9 +1,9 @@
-import { Ref } from '@typegoose/typegoose';
+import { getModelForClass, Ref } from '@typegoose/typegoose';
 
 import Property from 'src/util/decorator/model/property.decorator';
 import { User } from '../user/user.model';
 
-import { Date, Types } from 'mongoose';
+import { Date, Document, Types } from 'mongoose';
 
 enum OrderState {
   PENDING = 'PENDING',
@@ -11,7 +11,7 @@ enum OrderState {
   CANCELLED = 'CANCELLED',
 }
 
-export class Order {
+export class Order extends Document {
   @Property({ required: true, type: Types.ObjectId, ref: () => User })
   userId: Ref<User>;
 
@@ -24,3 +24,4 @@ export class Order {
   @Property({ required: true, type: Number })
   totalAmount: number;
 }
+export const OrderModel = getModelForClass(Order);

@@ -11,7 +11,7 @@ interface PatchApiOptions {
   }[];
   httpCode?: HttpStatus;
   param: { name: string; description: string };
-  body: {
+  body?: {
     type: any;
     description?: string;
   };

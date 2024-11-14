@@ -2,6 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Category } from 'src/model/category/category.model';
+import { Product } from 'src/model/product/product.model';
+import { User } from 'src/model/user/user.model';
 
 @Injectable()
 export class SwaggerConfig {
@@ -26,7 +29,9 @@ export class SwaggerConfig {
   setupSwagger(app: INestApplication) {
     try {
       const config = this.createSwaggerConfig();
-      const document = SwaggerModule.createDocument(app, config);
+      const document = SwaggerModule.createDocument(app, config, {
+        extraModels: [User, Product, Category],
+      });
 
       SwaggerModule.setup('api-docs', app, document, {
         swaggerOptions: {

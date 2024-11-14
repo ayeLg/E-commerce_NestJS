@@ -1,8 +1,8 @@
-import { Ref } from '@typegoose/typegoose';
+import { getModelForClass, Ref } from '@typegoose/typegoose';
 import { Order } from '../order/order.model';
 import { Product } from '../product/product.model';
 import Property from 'src/util/decorator/model/property.decorator';
-import { Types } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export class OrderItem extends Document {
   @Property({ required: true, type: Types.ObjectId, ref: () => Order })
@@ -17,3 +17,4 @@ export class OrderItem extends Document {
   @Property({ required: true, type: Number })
   price: number;
 }
+export const OrderItemModel = getModelForClass(OrderItem);

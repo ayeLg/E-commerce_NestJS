@@ -1,5 +1,5 @@
 import { Post, HttpCode, HttpStatus, applyDecorators } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 
 interface PostApiOptions {
   path: string;
@@ -14,6 +14,7 @@ interface PostApiOptions {
     type: any;
     description?: string;
   };
+  param?: { name: string; description: string };
 }
 
 export function PostApi({
@@ -22,6 +23,7 @@ export function PostApi({
   responses,
   httpCode = HttpStatus.CREATED,
   body,
+  param,
 }: PostApiOptions) {
   const decorators = [
     Post(path),
@@ -48,6 +50,11 @@ export function PostApi({
         type: body.type,
         description: body.description || `Payload for ${summary}`,
       }),
+    );
+  }
+  if (param) {
+    decorators.push(
+      ApiParam({ name: param.name, description: param.description }),
     );
   }
 

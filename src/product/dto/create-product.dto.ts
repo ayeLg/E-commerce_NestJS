@@ -1,15 +1,33 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateProductDto {
-  @IsNotEmpty({ message: 'Product name is required' })
-  @IsString({ message: 'Product name must be a string' })
-  readonly name: string;
+  @ApiProperty({
+    required: true,
+    description: "who's add this product",
+    example: '673053c0e112b5d860bc300d',
+  })
+  @IsNotEmpty()
+  @IsString()
+  userId: string;
 
-  @IsNotEmpty({ message: 'Product price is required' })
-  @IsNumber({}, { message: 'Product price must be a number' })
-  readonly price: number;
+  @ApiProperty({ description: 'Product name ', example: 'Apple' })
+  @IsNotEmpty()
+  @IsString()
+  name: string;
 
-  @IsNotEmpty({ message: 'Product quantity is required' })
-  @IsNumber({}, { message: 'Product quantity must be a number' })
-  readonly quantity: number;
+  @ApiProperty({ description: 'Product description', example: 'apple' })
+  @IsNotEmpty()
+  @IsString()
+  description: string;
+
+  @ApiProperty({ description: 'Product Price', example: 999.0 })
+  @IsNotEmpty()
+  @IsNumber()
+  price: number;
+
+  @ApiProperty({ description: 'Product Quantity', example: 100 })
+  @IsNotEmpty()
+  @IsNumber()
+  quantity: number;
 }

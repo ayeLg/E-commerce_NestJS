@@ -10,7 +10,9 @@ interface GetApiOptions {
     type?: any;
   }[];
   httpCode?: HttpStatus;
-  param?: { name: string; description: string };
+  param?:
+    | { name: string; description: string }
+    | { name: string; description: string }[];
 }
 
 export function GetApi({
@@ -36,9 +38,15 @@ export function GetApi({
 
   // Add ApiBody using model
   if (param) {
-    decorators.push(
-      ApiParam({ name: param.name, description: param.description }),
-    );
+    if (Array.isArray(param)) {
+      param.forEach((p) => {
+        decorators.push(ApiParam({ name: p.name, description: p.description }));
+      });
+    } else {
+      decorators.push(
+        ApiParam({ name: param.name, description: param.description }),
+      );
+    }
   }
 
   return applyDecorators(...decorators);
