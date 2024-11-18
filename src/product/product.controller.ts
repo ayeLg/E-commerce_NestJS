@@ -17,12 +17,26 @@ import { GetApi } from 'src/util/decorator/swagger/getApi.decorator';
 import { PatchApi } from 'src/util/decorator/swagger/patch.decorator';
 import { DeleteApi } from 'src/util/decorator/swagger/delete.decorator';
 import { ApiController } from 'src/util/decorator/swagger/apiController.decorator';
+import { CreateCartItemDto } from 'src/cart-item/dto/create-cart-item.dto';
 
 // @UseGuards(RoleGuard)
 // @Role('ADMIN')
 @ApiController('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+
+  private handleResponse(
+    res: Response,
+    success: boolean,
+    message: string,
+    data?: any,
+  ) {
+    if (success) {
+      return successResponse(res, `${message} successfully`, data);
+    } else {
+      return errorResponse(res, `${message} failed`);
+    }
+  }
 
   @PostApi({
     path: '/',
@@ -41,11 +55,8 @@ export class ProductController {
   ) {
     try {
       const product = await this.productService.create(createProductDto);
-      if (product) {
-        successResponse(res, 'Product created successfully', product);
-      } else {
-        errorResponse(res, 'Product created failed');
-      }
+
+      this.handleResponse(res, !!product, 'Product created', product);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -94,11 +105,8 @@ export class ProductController {
   ) {
     try {
       const products = await this.productService.findOne(id);
-      if (products) {
-        successResponse(res, 'Get the product successfully', products);
-      } else {
-        errorResponse(res, 'Get the product failed');
-      }
+
+      this.handleResponse(res, !!products, 'Get created', products);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -124,12 +132,8 @@ export class ProductController {
     @Res() res: Response,
   ) {
     try {
-      const products = await this.productService.update(id, updateProductDto);
-      if (products) {
-        successResponse(res, 'Update the product successfully', products);
-      } else {
-        errorResponse(res, 'Upate the product failed');
-      }
+      const product = await this.productService.update(id, updateProductDto);
+      this.handleResponse(res, !!product, 'Updated the product', product);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -153,12 +157,9 @@ export class ProductController {
     @Res() res: Response,
   ) {
     try {
-      const products = await this.productService.remove(id);
-      if (products) {
-        successResponse(res, 'Update the product successfully', products);
-      } else {
-        errorResponse(res, 'Upate the product failed');
-      }
+      const product = await this.productService.remove(id);
+
+      this.handleResponse(res, !!product, 'Remove the proudct', product);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -182,15 +183,8 @@ export class ProductController {
   ): Promise<Response | void> {
     try {
       const user = await this.productService.getUserWhoAdded(id);
-      if (user) {
-        successResponse(
-          res,
-          'Get the user who added product successfully',
-          user,
-        );
-      } else {
-        errorResponse(res, 'Get the user who added  product failed');
-      }
+
+      this.handleResponse(res, !!user, 'Get the user who added product', user);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -217,15 +211,12 @@ export class ProductController {
   ): Promise<Response | void> {
     try {
       const user = await this.productService.getUserWhoReviewed(id);
-      if (user) {
-        successResponse(
-          res,
-          'Get the users who reviewed product successfully',
-          user,
-        );
-      } else {
-        errorResponse(res, 'Get the users who reviewed  product failed');
-      }
+      this.handleResponse(
+        res,
+        !!user,
+        'Get the users who reviewed product',
+        user,
+      );
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -254,6 +245,20 @@ export class ProductController {
       } else {
         errorResponse(res, 'Get the reviews failed');
       }
+      this.handleResponse(res, !!reviews, 'Get the reviews', reviews);
+    } catch (error) {
+      if (!(error instanceof HttpException)) {
+        throw new BadRequestException((error as Error).message);
+      }
+      throw error;
+    }
+  }
+
+  async addToCart(@Res() res: Response, createCartItemDto: CreateCartItemDto) {
+    try {
+      const cartItem = await this.productService.addToCart(createCartItemDto);
+
+      this.handleResponse(res, !!cartItem, 'Add item to cart', cartItem);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);

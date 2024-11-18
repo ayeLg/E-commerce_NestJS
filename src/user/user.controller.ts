@@ -32,6 +32,18 @@ export class UserController {
     private readonly cartService: CartService,
   ) {}
 
+  private handleResponse(
+    res: Response,
+    success: boolean,
+    message: string,
+    data?: any,
+  ) {
+    if (success) {
+      return successResponse(res, message, data);
+    } else {
+      return errorResponse(res, message);
+    }
+  }
   @PostApi({
     path: '/',
     summary: 'Create a new user',
@@ -52,12 +64,7 @@ export class UserController {
     try {
       const user = await this.userService.create(createUserDto);
 
-      if (user) {
-        successResponse(res, 'User created successfully', user);
-        return;
-      } else {
-        errorResponse(res, 'User creation failed');
-      }
+      this.handleResponse(res, !!user, 'Create a user', user);
     } catch (error) {
       // Optional: Handle non-HttpException errors here
       if (!(error instanceof HttpException)) {
@@ -83,12 +90,8 @@ export class UserController {
   ): Promise<Response | void> {
     try {
       const user = await this.userService.findAll();
-      if (user) {
-        successResponse(res, 'Gell all user successfully', user);
-        return;
-      } else {
-        errorResponse(res, 'There is no user');
-      }
+
+      this.handleResponse(res, !!user, 'Gell all users', user);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -115,12 +118,8 @@ export class UserController {
   ): Promise<Response | void> {
     try {
       const user = await this.userService.findOne(id);
-      if (user) {
-        successResponse(res, 'Get the user successfully', user);
-        return;
-      } else {
-        errorResponse(res, 'Get the user failed');
-      }
+
+      this.handleResponse(res, !!user, 'Get the user', user);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -154,12 +153,8 @@ export class UserController {
   ): Promise<Response | void> {
     try {
       const user = await this.userService.update(id, updateUserDto);
-      if (user) {
-        successResponse(res, 'User created successfully', user);
-        return;
-      } else {
-        errorResponse(res, 'User creation failed');
-      }
+
+      this.handleResponse(res, !!user, 'Update the user', user);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -188,12 +183,8 @@ export class UserController {
   ): Promise<Response | void> {
     try {
       const user = await this.userService.remove(id);
-      if (user) {
-        successResponse(res, 'User created successfully', user);
-        return;
-      } else {
-        errorResponse(res, 'User creation failed');
-      }
+
+      this.handleResponse(res, !!user, 'Delete the user', user);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -226,12 +217,8 @@ export class UserController {
         userId: id,
         ...createProductDto,
       });
-      if (product) {
-        successResponse(res, 'Add product successfully', product);
-        return;
-      } else {
-        errorResponse(res, 'Add product failed');
-      }
+
+      this.handleResponse(res, !!product, 'Add product', product);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -255,12 +242,13 @@ export class UserController {
   ): Promise<Response | void> {
     try {
       const products = await this.userService.getProduct(id);
-      if (products) {
-        successResponse(res, 'Get products successfully', products);
-        return;
-      } else {
-        errorResponse(res, 'Get products failed');
-      }
+
+      this.handleResponse(
+        res,
+        !!products,
+        'Get the products that is added by user',
+        products,
+      );
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -289,12 +277,8 @@ export class UserController {
   ): Promise<Response | void> {
     try {
       const product = await this.userService.deleteProduct(id, productId);
-      if (product) {
-        successResponse(res, 'Delte product successfully', product);
-        return;
-      } else {
-        errorResponse(res, 'Delet product failed');
-      }
+
+      this.handleResponse(res, !!product, 'Delete the product', product);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -320,13 +304,9 @@ export class UserController {
     res: Response,
   ): Promise<Response | void> {
     try {
-      const user = await this.userService.getCart(id);
-      if (user) {
-        successResponse(res, "Get user's cart successfully", user);
-        return;
-      } else {
-        errorResponse(res, "Get user's cart failed");
-      }
+      const cart = await this.userService.getCart(id);
+
+      this.handleResponse(res, !!cart, 'Get the cart of the user', cart);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -361,6 +341,7 @@ export class UserController {
       } else {
         errorResponse(res, "Delete user's cart failed");
       }
+      this.handleResponse(res, !!cart, 'Delete the cart of the user', cart);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -385,12 +366,13 @@ export class UserController {
   ): Promise<Response | void> {
     try {
       const review = await this.userService.getReview(id);
-      if (review) {
-        successResponse(res, "Get user's review successfully", review);
-        return;
-      } else {
-        errorResponse(res, "Get user's review failed");
-      }
+
+      this.handleResponse(
+        res,
+        !!review,
+        'Get the reviews who is given by user',
+        review,
+      );
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -415,16 +397,13 @@ export class UserController {
   ): Promise<Response | void> {
     try {
       const cartItems = await this.userService.getCartItems(id);
-      if (cartItems) {
-        successResponse(
-          res,
-          "Get user's items from cart successfully",
-          cartItems,
-        );
-        return;
-      } else {
-        errorResponse(res, "Get user's items from cart failed");
-      }
+
+      this.handleResponse(
+        res,
+        !!cartItems,
+        'Get the item of the cart of the user',
+        cartItems,
+      );
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);

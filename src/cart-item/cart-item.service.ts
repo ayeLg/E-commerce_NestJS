@@ -251,7 +251,6 @@ export class CartItemService {
       if (!cartItem) {
         throw new NotFoundException('Product Not Found');
       }
-      console.log(cartItem);
 
       if (cartItem.quantity <= 0) {
         throw new HttpException(

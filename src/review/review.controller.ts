@@ -19,7 +19,18 @@ import { ApiController } from 'src/util/decorator/swagger/apiController.decorato
 @ApiController('review')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
-
+  private handleResponse(
+    res: Response,
+    success: boolean,
+    message: string,
+    data?: any,
+  ) {
+    if (success) {
+      return successResponse(res, message, data);
+    } else {
+      return errorResponse(res, message);
+    }
+  }
   @PostApi({
     path: '/',
     summary: 'Create Review',
@@ -35,10 +46,8 @@ export class ReviewController {
   ): Promise<Response | void> {
     try {
       const review = await this.reviewService.create(createReviewDto);
-      if (review) {
-        successResponse(res, 'Create review successfully', review);
-      }
-      errorResponse(res, 'Create review failed');
+
+      this.handleResponse(res, !!review, 'Create reiview', review);
     } catch (error) {
       if (!(error as HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -58,10 +67,8 @@ export class ReviewController {
   async findAll(@Res() res: Response): Promise<Response | void> {
     try {
       const review = await this.reviewService.findAll();
-      if (review) {
-        successResponse(res, 'Get all review successfully', review);
-      }
-      errorResponse(res, 'Get all review failed');
+
+      this.handleResponse(res, !!review, 'Get all reiviews', review);
     } catch (error) {
       if (!(error as HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -85,10 +92,8 @@ export class ReviewController {
   ): Promise<Response | void> {
     try {
       const review = await this.reviewService.findOne(id);
-      if (review) {
-        successResponse(res, 'Get the review successfully', review);
-      }
-      errorResponse(res, 'Get the review failed');
+
+      this.handleResponse(res, !!review, 'Get the reiview', review);
     } catch (error) {
       if (!(error as HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -114,10 +119,8 @@ export class ReviewController {
   ): Promise<Response | void> {
     try {
       const review = await this.reviewService.update(id, updateReviewDto);
-      if (review) {
-        successResponse(res, 'Update the review successfully', review);
-      }
-      errorResponse(res, 'Update the review failed');
+
+      this.handleResponse(res, !!review, 'Update the reiview', review);
     } catch (error) {
       if (!(error as HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -141,10 +144,8 @@ export class ReviewController {
   ): Promise<Response | void> {
     try {
       const review = await this.reviewService.remove(id);
-      if (review) {
-        successResponse(res, 'Delete review successfully', review);
-      }
-      errorResponse(res, 'Delete review failed');
+
+      this.handleResponse(res, !!review, 'Delete the reiview', review);
     } catch (error) {
       if (!(error as HttpException)) {
         throw new BadRequestException((error as Error).message);

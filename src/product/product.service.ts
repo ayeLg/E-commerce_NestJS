@@ -1,5 +1,6 @@
 import {
   HttpException,
+  Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -11,15 +12,32 @@ import { Product } from './entities/product.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/model/user/user.model';
 import { Review, ReviewModel } from 'src/model/review/review.model';
+import { CartItem, CartItemModel } from 'src/model/cart_item /cartItem.model';
+import { Cart, CartModel } from 'src/model/cart/cart.model';
+import { CartItemService } from 'src/cart-item/cart-item.service';
+import { CreateCartItemDto } from 'src/cart-item/dto/create-cart-item.dto';
 
 interface UserByProduct {
   user: User;
+}
+interface AddtoCart {
+  user: User;
+  cartId: string;
+  cartItem: {
+    _id: string;
+    product: Product;
+    quantity: number;
+  };
 }
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel(ProductModel.modelName) private productModel: Model<Product>,
     @InjectModel(ReviewModel.modelName) private reviewModel: Model<Review>,
+    @InjectModel(CartModel.modelName) private cartModel: Model<Cart>,
+    @InjectModel(CartItemModel.modelName)
+    private cartItemModel: Model<CartItem>,
+    @Inject(CartItemService) private cartItemService: CartItemService,
   ) {}
   async create(createProductDto: CreateProductDto): Promise<Product> {
     try {
@@ -164,6 +182,27 @@ export class ProductService {
         productId: new Types.ObjectId(id),
       });
       return reviews;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException((error as Error).message);
+    }
+  }
+
+  async addToCart(
+    createCartItemDto: CreateCartItemDto,
+  ): Promise<AddtoCart | null> {
+    try {
+      if (!createCartItemDto.cartId) {
+        const cart = await this.cartModel.create({
+          userId: createCartItemDto.userId,
+        });
+        createCartItemDto.cartId = cart.id;
+      }
+
+      const cartItem = this.cartItemService.create(createCartItemDto);
+      return cartItem;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

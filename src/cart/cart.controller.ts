@@ -18,6 +18,19 @@ import { ApiController } from 'src/util/decorator/swagger/apiController.decorato
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
+  private handleResponse(
+    res: Response,
+    success: boolean,
+    message: string,
+    data?: any,
+  ) {
+    if (success) {
+      return successResponse(res, message, data);
+    } else {
+      return errorResponse(res, message);
+    }
+  }
+
   @PostApi({
     path: '/',
     summary: 'Create cart',
@@ -33,11 +46,8 @@ export class CartController {
   ): Promise<Response | void> {
     try {
       const cart = await this.cartService.create(createCartDto);
-      if (cart) {
-        successResponse(res, 'Cart created successfully', cart);
-        return;
-      }
-      errorResponse(res, 'Cart creation failed');
+
+      this.handleResponse(res, !!cart, 'Create cart', cart);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -57,11 +67,7 @@ export class CartController {
   async findAll(@Res() res: Response) {
     try {
       const cart = await this.cartService.findAll();
-      if (cart) {
-        successResponse(res, 'Get all cart successfully', cart);
-        return;
-      }
-      errorResponse(res, 'Gell all cart failed');
+      this.handleResponse(res, !!cart, 'Get all carts', cart);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -82,11 +88,7 @@ export class CartController {
   async findOne(@Param('id') id: string, @Res() res: Response) {
     try {
       const cart = await this.cartService.findOne(id);
-      if (cart) {
-        successResponse(res, 'Get the cart successfully', cart);
-        return;
-      }
-      errorResponse(res, 'Get the cart failed');
+      this.handleResponse(res, !!cart, 'Get the cart', cart);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -126,11 +128,7 @@ export class CartController {
   async remove(@Param('id') id: string, @Res() res: Response) {
     try {
       const cart = await this.cartService.remove(id);
-      if (cart) {
-        successResponse(res, 'Cart created successfully', cart);
-        return;
-      }
-      errorResponse(res, 'Cart creation failed');
+      this.handleResponse(res, !!cart, 'Delete the cart', cart);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -154,11 +152,7 @@ export class CartController {
   ): Promise<Response | void> {
     try {
       const user = await this.cartService.getUser(id);
-      if (user) {
-        successResponse(res, 'Get user successfully', user);
-        return;
-      }
-      errorResponse(res, 'Get user failed');
+      this.handleResponse(res, !!user, 'Get the user of the cart', user);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -182,11 +176,13 @@ export class CartController {
   ): Promise<Response | void> {
     try {
       const products = await this.cartService.getProducts(id);
-      if (products) {
-        successResponse(res, 'Get products successfully', products);
-        return;
-      }
-      errorResponse(res, 'Get products failed');
+
+      this.handleResponse(
+        res,
+        !!products,
+        'Get the products of the cart',
+        products,
+      );
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -213,11 +209,13 @@ export class CartController {
   ): Promise<Response | void> {
     try {
       const cartItem = await this.cartService.removeProduct(id, productId);
-      if (cartItem) {
-        successResponse(res, 'Delete the product successfully', cartItem);
-        return;
-      }
-      errorResponse(res, 'Delete the product failed');
+
+      this.handleResponse(
+        res,
+        !!cartItem,
+        'Delete the item of the cart',
+        cartItem,
+      );
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);

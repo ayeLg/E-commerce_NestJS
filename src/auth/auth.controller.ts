@@ -18,7 +18,18 @@ import { PostApi } from 'src/util/decorator/swagger/postApi.decorator';
 @ApiController('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
+  private handleResponse(
+    res: Response,
+    success: boolean,
+    message: string,
+    data?: any,
+  ) {
+    if (success) {
+      return successResponse(res, message, data);
+    } else {
+      return errorResponse(res, message);
+    }
+  }
   @PostApi({
     path: '/register',
     summary: 'Register a new user',
@@ -38,12 +49,7 @@ export class AuthController {
   ): Promise<Response | void> {
     try {
       const user = await this.authService.registerService(authDto);
-
-      if (user) {
-        successResponse(res, 'Successfully registered', user);
-      } else {
-        errorResponse(res, 'Registration failed');
-      }
+      this.handleResponse(res, !!user, 'Registration', user);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -72,12 +78,7 @@ export class AuthController {
     try {
       const user = await this.authService.loginService(loginDTO);
 
-      //check email exists
-      if (user != null) {
-        successResponse(res, 'login Successfully', user);
-      } else {
-        errorResponse(res, 'Wrong Password');
-      }
+      this.handleResponse(res, !!user, 'Login', user);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);

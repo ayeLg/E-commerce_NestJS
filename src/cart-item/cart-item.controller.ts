@@ -19,6 +19,18 @@ import { DeleteApi } from 'src/util/decorator/swagger/delete.decorator';
 @ApiController('cart-item')
 export class CartItemController {
   constructor(private readonly cartItemService: CartItemService) {}
+  private handleResponse(
+    res: Response,
+    success: boolean,
+    message: string,
+    data?: any,
+  ) {
+    if (success) {
+      return successResponse(res, message, data);
+    } else {
+      return errorResponse(res, message);
+    }
+  }
 
   @PostApi({
     path: '/',
@@ -38,11 +50,8 @@ export class CartItemController {
   ) {
     try {
       const cartItem = await this.cartItemService.create(createCartItemDto);
-      if (cartItem) {
-        successResponse(res, 'Create cart item scuccssfully', cartItem);
-        return;
-      }
-      errorResponse(res, 'Create cart item failed');
+
+      this.handleResponse(res, !!cartItem, 'Create cartItem', cartItem);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -62,11 +71,8 @@ export class CartItemController {
   async findAll(@Res() res: Response) {
     try {
       const cartItem = await this.cartItemService.findAll();
-      if (cartItem) {
-        successResponse(res, 'Get all cart item scuccssfully', cartItem);
-        return;
-      }
-      errorResponse(res, 'Get all cart item failed');
+
+      this.handleResponse(res, !!cartItem, 'Get all cartItem', cartItem);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -87,11 +93,8 @@ export class CartItemController {
   async findOne(@Param('id') id: string, @Res() res: Response) {
     try {
       const cartItem = await this.cartItemService.findOne(id);
-      if (cartItem) {
-        successResponse(res, 'Get the cart item scuccssfully', cartItem);
-        return;
-      }
-      errorResponse(res, 'Get the cart item failed');
+
+      this.handleResponse(res, !!cartItem, 'Get the cartItem', cartItem);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -117,11 +120,8 @@ export class CartItemController {
   ) {
     try {
       const cartItem = await this.cartItemService.update(id, updateCartItemDto);
-      if (cartItem) {
-        successResponse(res, 'Update cart item scuccssfully', cartItem);
-        return;
-      }
-      errorResponse(res, 'Update cart item failed');
+
+      this.handleResponse(res, !!cartItem, 'Update the cartItem', cartItem);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -143,11 +143,8 @@ export class CartItemController {
   async remove(@Param('id') id: string, @Res() res: Response) {
     try {
       const cartItem = await this.cartItemService.remove(id);
-      if (cartItem) {
-        successResponse(res, 'Delete cart item scuccssfully', cartItem);
-        return;
-      }
-      errorResponse(res, 'Create cart item failed');
+
+      this.handleResponse(res, !!cartItem, 'Delete the cartItem', cartItem);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -171,11 +168,8 @@ export class CartItemController {
   ): Promise<Response | void> {
     try {
       const user = await this.cartItemService.getUser(id);
-      if (user) {
-        successResponse(res, 'Get the user scuccssfully', user);
-        return;
-      }
-      errorResponse(res, 'Get the user failed');
+
+      this.handleResponse(res, !!user, 'Get the user of  cartItem', user);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -198,11 +192,13 @@ export class CartItemController {
   ): Promise<Response | void> {
     try {
       const product = await this.cartItemService.getProduct(id);
-      if (product) {
-        successResponse(res, 'Get the product scuccssfully', product);
-        return;
-      }
-      errorResponse(res, 'Get the product failed');
+
+      this.handleResponse(
+        res,
+        !!product,
+        'Get the product of  cartItem',
+        product,
+      );
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -224,15 +220,13 @@ export class CartItemController {
   async increaseQuantity(@Param('id') id: string, @Res() res: Response) {
     try {
       const cartItem = await this.cartItemService.increaseQuantity(id);
-      if (cartItem) {
-        successResponse(
-          res,
-          'Increase prodcut quantity scuccssfully',
-          cartItem,
-        );
-        return;
-      }
-      errorResponse(res, 'Increase prodcut quantityfailed');
+
+      this.handleResponse(
+        res,
+        !!cartItem,
+        'Increase the product quantity of the cartItem',
+        cartItem,
+      );
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -253,15 +247,13 @@ export class CartItemController {
   async decreaseQuantity(@Param('id') id: string, @Res() res: Response) {
     try {
       const cartItem = await this.cartItemService.decreaseQuantity(id);
-      if (cartItem) {
-        successResponse(
-          res,
-          'Increase prodcut quantity scuccssfully',
-          cartItem,
-        );
-        return;
-      }
-      errorResponse(res, 'Increase prodcut quantityfailed');
+
+      this.handleResponse(
+        res,
+        !!cartItem,
+        'Decrease the product quantity of the cartItem',
+        cartItem,
+      );
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);

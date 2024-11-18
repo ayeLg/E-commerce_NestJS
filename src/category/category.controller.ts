@@ -20,6 +20,19 @@ import { DeleteApi } from 'src/util/decorator/swagger/delete.decorator';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  private handleResponse(
+    res: Response,
+    success: boolean,
+    message: string,
+    data?: any,
+  ) {
+    if (success) {
+      return successResponse(res, message, data);
+    } else {
+      return errorResponse(res, message);
+    }
+  }
+
   @PostApi({
     path: '/',
     summary: 'Create Category',
@@ -35,10 +48,8 @@ export class CategoryController {
   ): Promise<Response | void> {
     try {
       const category = await this.categoryService.create(createCategoryDto);
-      if (category) {
-        successResponse(res, 'Category created successfully', category);
-      }
-      errorResponse(res, 'Category creation failed');
+
+      this.handleResponse(res, !!category, 'Create category', category);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -58,10 +69,8 @@ export class CategoryController {
   async findAll(@Res() res: Response): Promise<Response | void> {
     try {
       const category = await this.categoryService.findAll();
-      if (category) {
-        successResponse(res, 'Get all category  successfully', category);
-      }
-      errorResponse(res, 'Get all category failed');
+
+      this.handleResponse(res, !!category, 'Get all category', category);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -85,10 +94,8 @@ export class CategoryController {
   ): Promise<Response | void> {
     try {
       const category = await this.categoryService.findOne(id);
-      if (category) {
-        successResponse(res, 'Get the category successfully', category);
-      }
-      errorResponse(res, 'Get the category failed');
+
+      this.handleResponse(res, !!category, 'Get the category', category);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -114,10 +121,8 @@ export class CategoryController {
   ): Promise<Response | void> {
     try {
       const category = await this.categoryService.update(id, updateCategoryDto);
-      if (category) {
-        successResponse(res, 'Update the category successfully', category);
-      }
-      errorResponse(res, 'Update the category failed');
+
+      this.handleResponse(res, !!category, 'Update the category', category);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
@@ -141,10 +146,8 @@ export class CategoryController {
   ): Promise<Response | void> {
     try {
       const category = await this.categoryService.remove(id);
-      if (category) {
-        successResponse(res, 'Delete the category successfully', category);
-      }
-      errorResponse(res, 'Delete the category failed');
+
+      this.handleResponse(res, !!category, 'Delete the category', category);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new BadRequestException((error as Error).message);
