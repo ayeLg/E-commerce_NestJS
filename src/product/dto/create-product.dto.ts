@@ -11,6 +11,15 @@ export class CreateProductDto {
   @IsString()
   userId: string;
 
+  @ApiProperty({
+    required: true,
+    description: 'Category ID',
+    example: '673053c0e112b5d860bc300d',
+  })
+  @IsNotEmpty()
+  @IsString()
+  categoryId: string;
+
   @ApiProperty({ description: 'Product name ', example: 'Apple' })
   @IsNotEmpty()
   @IsString()

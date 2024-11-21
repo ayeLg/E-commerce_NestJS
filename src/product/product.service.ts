@@ -51,9 +51,9 @@ export class ProductService {
     }
   }
 
-  async findAll(): Promise<Product[]> {
+  async findAll(skip: number, limit: number): Promise<Product[]> {
     try {
-      const products = await this.productModel.find();
+      const products = await this.productModel.find().skip(skip).limit(limit);
       return products;
     } catch (error) {
       if (error instanceof HttpException) {

@@ -5,6 +5,7 @@ import {
   HttpException,
   BadRequestException,
   Res,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -72,10 +73,30 @@ export class ProductController {
       { status: 200, description: 'Get all product successfully' },
       { status: 400, description: 'Bad Request' },
     ],
+    query: [
+      {
+        name: 'page',
+        description: 'Page number to retrieve',
+        required: false,
+      },
+      {
+        name: 'limit',
+        description: 'Number of products per page',
+        required: false,
+      },
+    ],
   })
-  async findAll(@Req() req: Request, @Res() res: Response) {
+  async findAll(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Query('page') page: number = 0,
+    @Query('limit') limit: number = 0,
+  ) {
     try {
-      const products = await this.productService.findAll();
+      // skip algorithm -> how many skip
+      const skip = (page - 1) * limit;
+
+      const products = await this.productService.findAll(skip, limit);
       if (products) {
         successResponse(res, 'Get all product successfully', products);
       } else {

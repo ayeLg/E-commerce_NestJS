@@ -2,10 +2,14 @@ import { getModelForClass, Ref } from '@typegoose/typegoose';
 import { Document, Types } from 'mongoose';
 import Property from 'src/util/decorator/model/property.decorator';
 import { User } from '../user/user.model';
+import { Category } from '../category/category.model';
 
 export class Product extends Document {
   @Property({ required: true, type: Types.ObjectId, ref: () => User })
   userId: Ref<User>;
+
+  @Property({ required: true, type: Types.ObjectId, ref: () => Category })
+  categoryId: Ref<Category>;
 
   @Property(
     { required: true, type: String }, // Typegoose options

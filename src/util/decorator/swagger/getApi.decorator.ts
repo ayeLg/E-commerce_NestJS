@@ -1,5 +1,5 @@
 import { applyDecorators, Get, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 interface GetApiOptions {
   path: string;
@@ -13,6 +13,10 @@ interface GetApiOptions {
   param?:
     | { name: string; description: string }
     | { name: string; description: string }[];
+
+  query?:
+    | { name: string; description: string; required: boolean }
+    | { name: string; description: string; required: boolean }[];
 }
 
 export function GetApi({
@@ -21,6 +25,7 @@ export function GetApi({
   responses,
   httpCode = HttpStatus.CREATED,
   param,
+  query,
 }: GetApiOptions) {
   const decorators = [Get(path), ApiOperation({ summary }), HttpCode(httpCode)];
 
@@ -45,6 +50,28 @@ export function GetApi({
     } else {
       decorators.push(
         ApiParam({ name: param.name, description: param.description }),
+      );
+    }
+  }
+  // Add ApiQuery using model
+  if (query) {
+    if (Array.isArray(query)) {
+      query.forEach((q) => {
+        decorators.push(
+          ApiQuery({
+            name: q.name,
+            description: q.description,
+            required: q.required,
+          }),
+        );
+      });
+    } else {
+      decorators.push(
+        ApiQuery({
+          name: query.name,
+          description: query.description,
+          required: query.required,
+        }),
       );
     }
   }
